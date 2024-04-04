@@ -4,6 +4,7 @@ import {useEffect, useState} from "react";
 function App() {
     const [countries, setCountries] = useState([]); // State to hold the countries
     const [selectedIso, setSelectedIso] = useState(""); // State to hold the selected ISO code
+    const [selectedDate, setSelectedDate] = useState(null);
     const [reportData, setReportData] = useState(null);
 
 
@@ -30,8 +31,11 @@ function App() {
     // Function to call the report endpoint with the selected ISO code
     const fetchReport = async () => {
         console.log("cal to reports...")
+        console.log(selectedDate)
         try {
-            const response = await fetch(`http://localhost:8080/reports/${selectedIso}`);
+            const url = `http://localhost:8080/reports?iso=${selectedIso}&date=${selectedDate}`;
+            const response = await fetch(url);
+            // const response = await fetch(`http://localhost:8080/reports/${selectedIso}`);
             if (response.ok) {
                 console.log("responce ok")
                 const data = await response.json();
@@ -44,6 +48,12 @@ function App() {
         } catch (error) {
             console.error('Error fetching report:', error);
         }
+    };
+
+    // Function to handle selected date change
+    const handleDateChange = (e) => {
+        const date = e.target.value;
+        setSelectedDate(date);
     };
 
     // Function to render the report data in a table format
@@ -78,12 +88,17 @@ function App() {
         <div className="App">
             <header className="App-header">
                 {/*<img src={logo} className="App-logo" alt="logo"/>*/}
-                <select value={selectedIso} onChange={handleChange}>
-                    <option value="">Select a country</option>
-                    {countries.map((country, index) => (
-                        <option key={index} value={country.name}>{country.name}</option>
-                    ))}
-                </select>
+                <div>
+                    <select value={selectedIso} onChange={handleChange}>
+                        <option value="">Select a country</option>
+                        {countries.map((country, index) => (
+                            <option key={index} value={country.name}>{country.name}</option>
+                        ))}
+                    </select>
+                    <div>
+                        <input type="date" value={selectedDate} onChange={handleDateChange}/>
+                    </div>
+                </div>
                 <p>Selected ISO: {selectedIso}</p>
                 <button onClick={fetchReport}>Fetch Report</button>
                 <div>
